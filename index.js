@@ -13,6 +13,9 @@ const cancelBtn = document.querySelector('.cancel');
 const deleteBtn = document.querySelector('.delete');
 const deleteAllBtn = document.querySelector('.delete-all');
 
+const light = document.querySelector('.light')
+const dark = document.querySelector('.dark')
+
 let root = document.documentElement;
 let ID = 0;
 let categoryIcon;
@@ -55,7 +58,7 @@ const createNewTransaction = () => {
 	newTransaction.classList.add('transaction');
 	newTransaction.setAttribute('id', ID);
 
-    checkCategory(selectedCategory);
+	checkCategory(selectedCategory);
 
 	newTransaction.innerHTML = `
     <p class="transaction-name">${categoryIcon} ${nameInput.value}</p>
@@ -71,16 +74,15 @@ const createNewTransaction = () => {
 		  newTransaction.classList.add('expense');
 
 	moneyArr.push(parseFloat(amountInput.value));
-
+	countMoney(moneyArr);
 	closePanel();
 	ID++;
 	clearInputs();
 };
 
-
-const selectCategory = () =>{
-    selectedCategory = categorySelect.options[categorySelect.selectedIndex].text;
-}
+const selectCategory = () => {
+	selectedCategory = categorySelect.options[categorySelect.selectedIndex].text;
+};
 
 //checking type of transaction
 const checkCategory = (transaction) => {
@@ -103,6 +105,59 @@ const checkCategory = (transaction) => {
 	}
 };
 
+//counting oney in array if plus add if minus divide
+
+const countMoney = (money) => {
+	const newMoney = money.reduce((a, b) => a + b);
+	availableMoney.textContent = `${newMoney} zł`;
+};
+
+
+//deleting transaction from incom area and divide from array
+const deleteTransaction = (id) => {
+	const transactionToDelete = document.getElementById(id);
+
+	const transactionAmount = parseFloat(
+		transactionToDelete.childNodes[3].innerText
+	);
+
+	const indexOfTransaction = moneyArr.indexOf(transactionAmount);
+
+	moneyArr.splice(indexOfTransaction, 1);
+
+	transactionToDelete.classList.contains('income') ? incomeSection.removeChild(transactionToDelete) : expensesSection.removeChild(transactionToDelete)
+
+	countMoney(moneyArr);
+};
+
+//delecting all transaction
+const deleteAllTransactions = () =>{
+	incomeSection.innerHTML = '<h3>Income:</h3>'
+	expensesSection.innerHTML = '<h3>Expenses:</h3>'
+	availableMoney.textContent = '0zł'
+	moneyArr = [0];
+}
+
+
+//changing to light style
+const changeStyleToLight = () =>{
+	root.style.setProperty('--first-color', '#F9F9F9')
+	root.style.setProperty('--second-color', '#14161F')
+	root.style.setProperty('--border-color', 'rgba(0, 0, 0, .2)')
+}
+
+//changing to dark style
+const changeStyleToDark = () =>{
+	root.style.setProperty('--first-color', '#14161F')
+	root.style.setProperty('--second-color', '#F9F9F9')
+	root.style.setProperty('--border-color', 'rgba(255,255,255,.4)')
+}
+
+
+
 addtransactionBtn.addEventListener('click', showPanel);
 cancelBtn.addEventListener('click', closePanel);
 saveBtn.addEventListener('click', checkForm);
+deleteAllBtn.addEventListener('click', deleteAllTransactions)
+light.addEventListener('click', changeStyleToLight)
+dark.addEventListener('click', changeStyleToDark)
